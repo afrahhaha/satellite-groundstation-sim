@@ -44,8 +44,13 @@ for i in range(1,181):
 
     lat = subpoint.latitude.degrees
     lon = subpoint.longitude.degrees
-    alt = subpoint.elevation.km
+    sat_height_km = subpoint.elevation.km
 
+    # break the line where the track wraps from +180 to -180 longitude,
+    # otherwise matplotlib draws a stray line across the whole map
+    if sat_longitude and abs(lon - sat_longitude[-1]) > 180:
+        sat_latitude.append(np.nan)
+        sat_longitude.append(np.nan)
     sat_latitude.append(lat)
     sat_longitude.append(lon)
 
@@ -54,8 +59,8 @@ for i in range(1,181):
     # ax.plot(sat_longitude,sat_latitude)
     # ax.legend()
     # ax.grid(True)
-    # ax.set_xlabel('Latitude')
-    # ax.set_ylabel('Longitude')
+    # ax.set_xlabel('Longitude')
+    # ax.set_ylabel('Latitude')
     # ax.set_title("ISS Ground Track for 3 Hours")
 
     #plt.show()
@@ -64,8 +69,8 @@ for i in range(1,181):
     for name, station in stations.items():
         difference = sat - station      #finds the relative position of the sat with respect to the station.
         topocentric = difference.at(t)
-        alt, az, distance = topocentric.altaz() 
-        visibility[name] = alt.degrees> 10  # visible if above 10° elevation
+        elevation, azimuth, distance = topocentric.altaz()
+        visibility[name] = elevation.degrees > 10  # visible if above 10° elevation
     
     print(f"Time: {t.utc_datetime()}, Visibility: {visibility}")
     
@@ -82,8 +87,8 @@ for i in range(1,181):
     ax.scatter([77.5946, 76.9366], [12.9716, 8.5421], color='green', marker='^', label='Ground Stations')
     ax.legend()
     ax.grid(True)
-    ax.set_xlabel('Latitude')
-    ax.set_ylabel('Longitude')
+    ax.set_xlabel('Longitude (°)')
+    ax.set_ylabel('Latitude (°)')
     ax.set_title("Handover Graph between Ground Stations")
     
     plt.pause(0.1)
