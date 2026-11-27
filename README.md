@@ -1,44 +1,61 @@
-# RocketLeague
-Assignment submission for Rocket League -Avionics sig
+# RocketLeague: Avionics SIG Assignment
 
-The link to my tinkercad submissions are here:
-Task_1: https://www.tinkercad.com/things/eawZW6LQ0fM/editel?returnTo=%2Fdashboard&sharecode=fOnbhJLf8IrwkB0u4JmM-FzWl5wEIzXrhUbVIpVkmIQ 
-Task_2: https://www.tinkercad.com/things/lKAOquQibA7/editel?sharecode=B3Yp8Zofydtt71hg8PQi2FqUPbz468YAo9Oj-WLG6Yk
-Task_3: https://www.tinkercad.com/things/k4Hwa6etq5L/editel?sharecode=ai5RcPW1sPqFH2a5IRL0nhPPKm2wDeBtQbfo308rRis
-Task_4: https://www.tinkercad.com/things/9C9aE0aqXwJ/editel?sharecode=rn6gZdgCpDnyOH6bd62WIiIB33__HyEneyWRjF0F7VM
+My submission for the NITK Rocket League Avionics SIG assignment. It covers satellite tracking and ground-station handover, rocket flight simulation, real-time telemetry plotting, and basic Arduino I/O.
 
-x=numpy.array(0,100,1) - creates an array x containing numbers from 1 to 100
-array- optimized for numerical computation; 
-ax= figure.add_subplot(nrows,ncloumns,index)- adds axes to the figure
-tab=np.eye(100,100)= creates I matrix
-temperature=random.uniform(20,40)- returns a random floating number between 20 and 40
+## Contents
 
-1.download TLE data from Space-track.org
- 	- the TLE data is obtained from ELSET(element set)
- 	- ISS(Zarya)-25544-Low Earth Orbit~400 km
-TLE- contains orbital elements of a satellite
- 	Inclination (°) ; RAAN (°); Eccentricity ;Argument of perigee (°); Mean; anomaly (°);Mean motion (rev/day); Epoch (Julian date)
+| File | What it does |
+|---|---|
+| `HandOver_Simulation.py` | Propagates the ISS orbit from a TLE with Skyfield, plots its ground track, and logs handovers between two ground stations (Bengaluru, Trivandrum) using a 10° elevation mask. |
+| `MaxVandT.py` | Simulates a vertical rocket flight (powered ascent, then ballistic coast) and reports the maximum velocity and altitude, checked against the analytic solution. |
+| `Telemetry.py` | Live-updating plot of temperature, voltage and current. Uses **simulated** (random) data in place of a real downlink. |
+| `Arduino/ButtonLED` | LED on while a button is held. |
+| `Arduino/BinaryCounter` | 4-bit binary counter (0–15) on four LEDs, with a debounced push button. |
+| `Arduino/PotDimmer` | Potentiometer controls LED brightness via PWM. |
 
-2. Propogate the orbit
-**-** use skyfield.api
+## Running
 
- 	1) define the TLE data of the satellite
- 	sat=EarthSatellite(line1,line2,"ISS(ZARYA)"
- 	2) define the timescale for propagation by loading UTC times
- 	3)find position of the satellite at t in timescale
- 		geocentric = the satellite’s ECI position vectors at the given times.
+```
+pip install numpy matplotlib skyfield
+python HandOver_Simulation.py
+python MaxVandT.py
+python Telemetry.py
+```
 
-different coordinates for the representation of position vector of the satellite
-1.Earth-Centered,Earth-Fixed(ECEF): the x,y,z coordinates taking the centre of earth as origin
-2.Geodetic Coordinates:(Latitude, Longitude,Height):
-uses reference ellipsoid like WGS 84.
- 	Latitude (lat/Φ): The angle north or south of the equator.
- 	Longitude (lon/λ): The angle east or west of the prime meridian.
- 	Ellipsoidal height (h): The altitude above the reference ellipsoid surface
-3.Keplerian Elements: Inclination (°) ; RAAN (°); Eccentricity ;Argument of perigee (°); Mean; anomaly (°);Mean motion (rev/day); Epoch (Julian date)
+Open each Arduino sketch folder in the Arduino IDE.
 
-The degree of visibility of satellite from any ground station:
-⦁	topocentric.at() : includes the position of the satellite in the staion's reference frame; stores in the form of 3D vectors(x,y,z)
-⦁	in theory: visibility exists above 0 degree. but practically for a LEO 5-10 is a safe region to assume visibility at.
+## Tinkercad circuits
 
+- [Task 1](https://www.tinkercad.com/things/eawZW6LQ0fM/editel?returnTo=%2Fdashboard&sharecode=fOnbhJLf8IrwkB0u4JmM-FzWl5wEIzXrhUbVIpVkmIQ)
+- [Task 2](https://www.tinkercad.com/things/lKAOquQibA7/editel?sharecode=B3Yp8Zofydtt71hg8PQi2FqUPbz468YAo9Oj-WLG6Yk)
+- [Task 3](https://www.tinkercad.com/things/k4Hwa6etq5L/editel?sharecode=ai5RcPW1sPqFH2a5IRL0nhPPKm2wDeBtQbfo308rRis)
+- [Task 4](https://www.tinkercad.com/things/9C9aE0aqXwJ/editel?sharecode=rn6gZdgCpDnyOH6bd62WIiIB33__HyEneyWRjF0F7VM)
 
+## Notes
+
+### Python/NumPy basics used
+- `np.arange(0, 100, 1)` creates an array of the integers 0 to 99 (the stop value is excluded).
+- NumPy arrays are optimized for numerical computation.
+- `fig.add_subplot(nrows, ncols, index)` adds a set of axes to a figure.
+- `np.eye(100)` creates a 100×100 identity matrix.
+- `random.uniform(20, 40)` returns a random float between 20 and 40.
+
+### Satellite tracking workflow
+1. **Get TLE data** from Space-Track.org (element sets, ELSET). Example: ISS (ZARYA), NORAD ID 25544, low Earth orbit at about 400 km.
+   A TLE encodes the orbital elements: inclination (°), RAAN (°), eccentricity, argument of perigee (°), mean anomaly (°), mean motion (rev/day), and epoch.
+2. **Propagate the orbit** with `skyfield.api`:
+   1. Define the satellite from its TLE: `sat = EarthSatellite(line1, line2, "ISS (ZARYA)")`
+   2. Load a timescale for the propagation times.
+   3. `sat.at(t)` gives the geocentric (ECI) position vector at each time.
+
+### Coordinate systems for the satellite position
+1. **Earth-Centered, Earth-Fixed (ECEF):** x, y, z with the centre of the Earth as origin, rotating with the Earth.
+2. **Geodetic (latitude, longitude, height):** relative to a reference ellipsoid such as WGS 84.
+   - Latitude (φ): angle north or south of the equator.
+   - Longitude (λ): angle east or west of the prime meridian.
+   - Ellipsoidal height (h): altitude above the ellipsoid surface.
+3. **Keplerian elements:** inclination, RAAN, eccentricity, argument of perigee, mean anomaly, mean motion, epoch.
+
+### Visibility from a ground station
+- `(sat - station).at(t)` gives the satellite's position in the station's topocentric frame; `.altaz()` returns elevation, azimuth and range.
+- In theory the satellite is visible above 0° elevation. In practice, for LEO, a 5–10° elevation mask is used to allow for terrain and atmospheric effects.
