@@ -1,4 +1,4 @@
-# a simulation on ground station- satellite tracking
+# Simulation on ground station- satellite tracking
 
 It covers satellite tracking and ground-station handover, rocket flight simulation, real-time telemetry plotting, and basic Arduino I/O.
 
