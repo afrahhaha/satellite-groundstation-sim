@@ -1,6 +1,6 @@
-# RocketLeague: Avionics SIG Assignment
+# a simulation on ground station- satellite tracking
 
-My submission for the NITK Rocket League Avionics SIG assignment. It covers satellite tracking and ground-station handover, rocket flight simulation, real-time telemetry plotting, and basic Arduino I/O.
+It covers satellite tracking and ground-station handover, rocket flight simulation, real-time telemetry plotting, and basic Arduino I/O.
 
 ## Contents
 
